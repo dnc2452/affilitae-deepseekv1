@@ -5,25 +5,18 @@ Caption Skills - Kỹ năng tạo và tối ưu caption
 """
 
 import logging
-from typing import Dict, List, Optional, Any  # ← THÊM DÒNG NÀY
+from typing import Dict, List, Optional, Any, Union
 
 logger = logging.getLogger(__name__)
 
 class CaptionSkills:
-import logging
-from typing import List
-
-logger = logging.getLogger(__name__)
-
-class CaptionSkills:
-    """Caption and content generation skills"""
+    """Kỹ năng xử lý caption cho các nền tảng"""
     
     def __init__(self):
-        logger.info("CaptionSkills loaded")
+        logger.info("✅ CaptionSkills loaded")
     
-    async def generate_tiktok_caption(self, product_name: str, price: str, 
-                                     commission: float) -> List[str]:
-        """Generate TikTok captions"""
+    async def generate_tiktok_caption(self, product_name: str, price: str, commission: float) -> List[str]:
+        """Tạo caption cho TikTok"""
         logger.info(f"Generating TikTok captions for {product_name}")
         
         captions = [
@@ -31,11 +24,10 @@ class CaptionSkills:
             f"💰 Best price for {product_name} right now! Link in bio #deals #viral",
             f"⚡ Don't miss this! {product_name} at {price} - Limited time! #musthave",
         ]
-        
         return captions
     
     async def generate_facebook_caption(self, product_name: str, price: str) -> List[str]:
-        """Generate Facebook captions"""
+        """Tạo caption cho Facebook"""
         logger.info(f"Generating Facebook captions for {product_name}")
         
         captions = [
@@ -43,11 +35,10 @@ class CaptionSkills:
             f"Don't you just love {product_name}? \n🛍️ {price}\n📦 Fast shipping\n💬 Comment for link!",
             f"Introducing {product_name}!\n💝 Special price: {price}\n🌟 5-star reviews\n👇 Get yours now!",
         ]
-        
         return captions
     
     async def generate_hashtags(self, product_category: str) -> List[str]:
-        """Generate trending hashtags"""
+        """Tạo hashtags theo category"""
         logger.info(f"Generating hashtags for {product_category}")
         
         hashtags = {
@@ -55,30 +46,25 @@ class CaptionSkills:
             'Fashion': ['#fashion', '#style', '#ootd', '#shopping', '#trending'],
             'Home': ['#homedecor', '#home', '#lifestyle', '#interior', '#diy'],
         }
-        
         return hashtags.get(product_category, ['#shopping', '#deals', '#trending'])
     
     async def optimize_caption_for_platform(self, caption: str, platform: str) -> str:
-        """Optimize caption for specific platform"""
+        """Tối ưu caption cho từng nền tảng"""
         logger.info(f"Optimizing caption for {platform}")
         
         if platform == 'tiktok':
-            # TikTok: max 150 chars, use trending hashtags
             optimized = caption[:150] + " #foryou #trending"
         elif platform == 'facebook':
-            # Facebook: longer text allowed, use emojis
             optimized = caption + "\n👇 Comment for link!"
         else:
             optimized = caption
-        
         return optimized
     
-    async def check_caption_compliance(self, caption: str, platform: str) -> Dict:
-        """Check if caption violates platform policies"""
+    async def check_caption_compliance(self, caption: str, platform: str) -> Dict[str, Any]:
+        """Kiểm tra caption có vi phạm chính sách không"""
         logger.info(f"Checking compliance for {platform}")
         
         violations = []
-        
         banned_words = {
             'tiktok': ['earn money', 'get rich', 'buy now', 'spam'],
             'facebook': ['guaranteed', 'click here', 'act fast'],
