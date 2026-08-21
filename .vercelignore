@@ -1,0 +1,10 @@
+# .vercelignore
+data/
+logs/
+*.xlsx
+*.db
+*.pyc
+__pycache__/
+.vscode/
+.idea/
+*.log
