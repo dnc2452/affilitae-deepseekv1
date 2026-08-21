@@ -1,0 +1,74 @@
+﻿name: Test Affiliate Agent
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        playwright install chromium
+    
+    - name: Create .env file
+      run: |
+        cat > .env << 'EOF'
+        SHOPEE_EMAIL=your_email@gmail.com
+        SHOPEE_PASSWORD=your_password
+        SHOPEE_PHONE=your_phone
+        TIKTOK_USERNAME=your_username
+        TIKTOK_PASSWORD=your_password
+        TIKTOK_EMAIL=your_email@gmail.com
+        FACEBOOK_EMAIL=your_email@gmail.com
+        FACEBOOK_PASSWORD=your_password
+        FACEBOOK_PAGE_ID=your_page_id
+        OLLAMA_URL=http://localhost:11434
+        CLAUDE_API_KEY=
+        OPENAI_API_KEY=your_openai_key_here
+        GEMINI_API_KEY=your_gemini_key_here
+        OPEN_AFFILIATE_URL=https://openaffiliate.dev/api
+        TELEGRAM_BOT_TOKEN=your_telegram_token_here
+        TELEGRAM_CHANNEL_ID=@your_channel
+        TELEGRAM_ADMIN_IDS=your_admin_ids
+        HEADLESS_MODE=true
+        N8N_ENABLED=false
+        DEBUG_MODE=true
+        EOF
+    
+    - name: Test import
+      run: |
+        python -c "from orchestrator import AffiliateAgentOrchestrator; print('✅ IMPORT OK')"
+    
+    - name: Run mock test
+      run: |
+        python -c "
+import asyncio
+import logging
+logging.basicConfig(level=logging.INFO)
+from orchestrator import AffiliateAgentOrchestrator
+
+async def test():
+    print('🚀 Starting test...')
+    orchestrator = AffiliateAgentOrchestrator()
+    print('✅ Orchestrator created')
+    success = await orchestrator.run_full_workflow(
+        run_research=True,
+        research_query='AI',
+        use_browser=False
+    )
+    print('✅' if success else '❌', 'Test completed!')
+
+asyncio.run(test())
+"
