@@ -23,6 +23,7 @@ class TelegramUpdate(BaseModel):
     message: dict = None
 
 async def send_telegram_message(chat_id: int, text: str):
+    """Gửi tin nhắn qua Telegram Bot API"""
     import httpx
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     async with httpx.AsyncClient() as client:
@@ -42,11 +43,7 @@ async def telegram_webhook(update: dict):
         if 'shopee.vn' in text or 'shopee' in text:
             logger.info(f"Received product link from {chat_id}: {text}")
             await send_telegram_message(chat_id, "🔍 Đang xử lý link sản phẩm của bạn...")
-            
             # TODO: Gọi orchestrator xử lý link
-            # orchestrator = AffiliateAgentOrchestrator()
-            # await orchestrator.process_manual_link(text, chat_id)
-            
             return {"status": "processing"}
         elif text == '/start':
             await send_telegram_message(chat_id, "Chào mừng bạn đến với AI Affiliate Agent Bot! Gửi link Shopee để tôi xử lý.")
