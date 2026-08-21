@@ -178,7 +178,7 @@ class AffiliateAgentOrchestrator:
             return None
     
     # ============================================================
-    # PHASE 1: DISCOVER PRODUCTS (ĐÃ SỬA - BỎ QUA LỌC)
+    # PHASE 1: DISCOVER PRODUCTS
     # ============================================================
     async def phase_1_discover_products(self, use_browser: bool = False):
         """Phase 1: Discover high-commission products"""
@@ -193,8 +193,8 @@ class AffiliateAgentOrchestrator:
                 'timestamp': datetime.now().isoformat()
             })
             
-            # Sử dụng mock data thay vì browser (để test nhanh)
-            logger.info("🌐 Fetching real data from Shopee...")
+            # Sử dụng mock data để test
+            logger.info("📦 Using mock data for testing...")
             products = await self.product_agent.scan_trending_products(limit=5)
             
             if not products:
@@ -204,9 +204,12 @@ class AffiliateAgentOrchestrator:
             
             logger.info(f"✅ Found {len(products)} trending products")
             
-            # 🔥 ĐÃ SỬA: Bỏ qua bước lọc để mock data được xử lý
-            high_comm_products = products
-            logger.info(f"✅ {len(high_comm_products)} products processed")
+            # Filter high commission
+            high_comm_products = await self.shopee_skills.filter_high_commission_products(
+                products, min_commission=15.0
+            )
+            
+            logger.info(f"✅ {len(high_comm_products)} products with commission >= 15%")
             
             # Generate affiliate links
             products_with_links = await self.product_agent.generate_affiliate_links(high_comm_products)
@@ -468,7 +471,7 @@ class AffiliateAgentOrchestrator:
                     logger.info(f"✅ Research completed: {len(researched)} programs found")
             
             # Phase 1: Discover
-            products = await self.phase_1_discover_products(use_browser=use_browser)
+            products = await self.phase_1_discover_products(use_browser=False)
             if not products:
                 logger.error("❌ Cannot proceed - Phase 1 failed")
                 return False

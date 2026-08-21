@@ -1,8 +1,3 @@
-# Xóa file cũ
-Remove-Item test_mock.py -Force
-
-# Tạo file mới với nội dung đúng
-@'
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -45,9 +40,8 @@ async def test_mock():
         import traceback
         traceback.print_exc()
         return False
-    
+   
     return True
 
 if __name__ == "__main__":
     asyncio.run(test_mock())
-'@ | Out-File -FilePath test_mock.py -Encoding utf8

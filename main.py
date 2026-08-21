@@ -1,91 +1,87 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-AI Affiliate Agent - Kiếm tiền tự động từ Shopee + TikTok
-Version 2.0 - With MCP, Sub-Agents, Skills
+AI Affiliate Agent - Main Entry Point
 """
 
-import os
 import sys
 import asyncio
 import logging
+import codecs
 from datetime import datetime
-from dotenv import load_dotenv
 
-# Load environment
-load_dotenv()
-
-# Create directories
-for dir_path in ['./data', './data/videos', './data/reports', './logs', './config', './agents', './sub_agents', './skills', './mcp']:
-    os.makedirs(dir_path, exist_ok=True)
+# Set encoding for stdout to handle emoji/Unicode on Windows
+if sys.platform == 'win32':
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer)
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer)
 
 # Setup logging
-log_file = f'./logs/app_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(log_file),
-        logging.StreamHandler()
+        logging.StreamHandler(sys.stdout)
     ]
 )
-
 logger = logging.getLogger(__name__)
-
-# Import orchestrator
-try:
-    from orchestrator import AffiliateAgentOrchestrator
-except ImportError as e:
-    logger.error(f"❌ Import error: {e}")
-    logger.error("Make sure all files are in correct directories!")
-    sys.exit(1)
 
 
 async def main():
     """Main entry point"""
+    logger.info("=" * 60)
+    logger.info("🚀 AI AFFILIATE AGENT STARTING")
+    logger.info(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    logger.info("=" * 60)
+    
     try:
-        # Check Python version
-        if sys.version_info < (3, 10):
-            logger.error("❌ Python 3.10+ is required")
-            sys.exit(1)
+        from orchestrator import AffiliateAgentOrchestrator
         
-        logger.info("🚀 Starting AI Affiliate Agent Orchestrator...")
-        
-        # Initialize orchestrator
         orchestrator = AffiliateAgentOrchestrator()
+        logger.info("✅ Orchestrator initialized")
         
-        # Run workflow
-        success = await orchestrator.run_full_workflow()
+        success = await orchestrator.run_full_workflow(
+            run_research=True,
+            research_query="AI",
+            use_browser=False
+        )
         
         if success:
-            logger.info("\n" + "="*70)
-            logger.info("🎉 Agent completed all tasks successfully!")
-            logger.info("="*70)
-            logger.info("\n📊 What happens next:")
-            logger.info("   1. Monitor your TikTok & Facebook posts")
-            logger.info("   2. Check affiliate earnings in your dashboard")
-            logger.info("   3. Optimize content based on analytics")
-            logger.info("   4. Run agent again tomorrow for more posts")
-            logger.info("\n💡 Tips:")
-            logger.info("   - Create consistent content daily")
-            logger.info("   - Monitor views, likes, and clicks")
-            logger.info("   - Refine captions based on performance")
-            logger.info("   - Scale to multiple product categories")
-            return 0
+            logger.info("\n" + "=" * 60)
+            logger.info("🎉 ALL TASKS COMPLETED SUCCESSFULLY!")
+            logger.info("=" * 60)
+            
+            # In kết quả
+            results = orchestrator.workflow_results
+            logger.info(f"\n📊 Final Results:")
+            logger.info(f"   ✅ Products: {len(results.get('products', []))}")
+            logger.info(f"   ✅ Contents: {len(results.get('contents', []))}")
+            logger.info(f"   ✅ Posts: {len(results.get('posted', []))}")
+            
+            # Kết nối Telegram nếu có
+            if orchestrator.telegram_agent:
+                await orchestrator.telegram_agent.send_message(
+                    text=f"✅ **Workflow Completed!**\n"
+                         f"📊 Products: {len(results.get('products', []))}\n"
+                         f"🎬 Contents: {len(results.get('contents', []))}\n"
+                         f"📤 Posts: {len(results.get('posted', []))}"
+                )
+                logger.info("✅ Telegram notification sent")
+            
+            return True
         else:
-            logger.error("\n❌ Workflow failed")
-            return 1
+            logger.error("❌ Workflow failed!")
+            return False
             
     except KeyboardInterrupt:
-        logger.info("\n⏸️  Agent stopped by user")
-        return 0
+        logger.info("\n⏹️ Stopped by user")
+        return False
     except Exception as e:
-        logger.error(f"\n❌ Unexpected error: {e}")
+        logger.error(f"❌ Error: {e}")
         import traceback
         traceback.print_exc()
-        return 1
+        return False
 
 
-if __name__ == '__main__':
-    exit_code = asyncio.run(main())
+if __name__ == "__main__":
+    exit_code = 0 if asyncio.run(main()) else 1
     sys.exit(exit_code)
