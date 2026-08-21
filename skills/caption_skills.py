@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Caption Skills - Kỹ năng tạo và tối ưu caption
+"""
+
+import logging
+from typing import Dict, List, Optional, Any  # ← THÊM DÒNG NÀY
+
+logger = logging.getLogger(__name__)
+
+class CaptionSkills:
 import logging
 from typing import List
 
